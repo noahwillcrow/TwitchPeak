@@ -6,7 +6,14 @@ body {
 	padding: 8px 4px 0 4px;
 }
 
-input {
+label {
+	height: 16px;
+	font-size: 16px;
+	line-height: 16px;
+	padding: 4px 0;
+}
+
+input:not([type=checkbox]) {
 	height: 16px;
 	font-size: 16px;
 	line-height: 16px;
@@ -22,10 +29,12 @@ input {
 #txtGameName {
 	background-color: transparent;
 	border-bottom: 1px solid #dfdfdf;
+	margin-bottom: 1px;
 	outline: none !important;
 }
 	#txtGameName:focus {
 		border-bottom: 2px solid #4b367c;
+		margin-bottom: 0;
 	}
 
 #btnOpenTab {

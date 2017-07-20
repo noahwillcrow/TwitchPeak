@@ -3,10 +3,40 @@ var timeout = 30 * 1000;
 
 var tabsToMonitor = [];
 
-function goToTopStreamForGame(tabId, gameName) {
+function checkTabs() {
+	for (var i = 0; i < tabsToMonitor.length; i++) {
+		var tabInfo = tabsToMonitor[i];
+		goToTopStreamForGame(tabInfo.tabId)
+	}
+
+	setTimeout(checkTabs, timeout);
+}
+
+function getTabInfo(tabId) {
+	for (var i = 0; i < tabsToMonitor.length; i++) {
+		var tabInfo = tabsToMonitor[i];
+		if (tabInfo.tabId == tabId) {
+			return tabInfo;
+		}
+	}
+	return null;
+}
+
+function isTwitchPeakTab(tabId) {
+	var tabInfo = getTabInfo();
+
+	if (tabInfo == null) {
+		return false;
+	}
+	return true;
+}
+
+function goToTopStreamForGame(tabId) {
+	var tabInfo = getTabInfo(tabId);
+
 	chrome.tabs.get(tabId, function(tab) {
 		var requestData = {
-			"game": gameName,
+			"game": tabInfo.gameName,
 			"client_id": clientId,
 			"limit": 1
 		};
@@ -21,7 +51,14 @@ function goToTopStreamForGame(tabId, gameName) {
 			}
 
 			var topStream = responseData.streams[0];
-			var streamUrl = "https://www.twitch.tv/" + topStream.channel.name;
+			var streamUrl;
+
+			if (tabInfo.isFullscreen) {
+				streamUrl = "http://player.twitch.tv/?channel=" + topStream.channel.name;
+			}
+			else {
+				streamUrl = "https://www.twitch.tv/" + topStream.channel.name;
+			}
 
 			if (tab.url == streamUrl) {
 				return;
@@ -32,19 +69,14 @@ function goToTopStreamForGame(tabId, gameName) {
 	});
 }
 
-function checkTabs() {
-	for (var i = 0; i < tabsToMonitor.length; i++) {
-		var tabInfo = tabsToMonitor[i];
-		goToTopStreamForGame(tabInfo.tabId, tabInfo.gameName)
-	}
+function addTab(gameName, isFullscreen) {
+	var createOptions = {
+		"active": true
+	};
 
-	setTimeout(checkTabs, timeout);
-}
-
-function addTab(gameName) {
-	chrome.tabs.create({ "active": true }, function(tab) {
-		goToTopStreamForGame(tab.id, gameName);
-		tabsToMonitor.push({"tabId": tab.id, "gameName": gameName});
+	chrome.tabs.create(createOptions, function(tab) {
+		tabsToMonitor.push({"tabId": tab.id, "isFullscreen": isFullscreen, "gameName": gameName});
+		goToTopStreamForGame(tab.id);
 	});
 }
 
@@ -58,6 +90,4 @@ chrome.tabs.onRemoved.addListener(function(tabId) {
 	}
 });
 
-$(function() {
-	checkTabs();
-});
+checkTabs();
