@@ -1,0 +1,42 @@
+body {
+}
+
+#container {
+	width: 244px;
+	padding: 8px 4px 0 4px;
+}
+
+input {
+	height: 16px;
+	font-size: 16px;
+	line-height: 16px;
+	padding: 4px 0;
+
+	width: 100%;
+	margin: 0;
+	display: block;
+
+	border: none;
+}
+
+#txtGameName {
+	background-color: transparent;
+	border-bottom: 1px solid #dfdfdf;
+	outline: none !important;
+}
+	#txtGameName:focus {
+		border-bottom: 2px solid #4b367c;
+	}
+
+#btnOpenTab {
+	background-color: #4b367c;
+	color: #d7cceb;
+
+	box-sizing: content-box;
+
+	cursor: pointer;
+}
+	#btnOpenTab:hover {
+		color: white;
+		text-decoration: underline;
+	}
