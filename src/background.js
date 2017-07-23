@@ -5,8 +5,13 @@ var tabsToMonitor = [];
 
 function checkTabs() {
 	for (var i = 0; i < tabsToMonitor.length; i++) {
-		var tabInfo = tabsToMonitor[i];
-		goToTopStreamForGame(tabInfo.tabId)
+		try {
+			var tabInfo = tabsToMonitor[i];
+			goToTopStreamForGame(tabInfo.tabId);
+		}
+		catch() {
+			console.log("Exception occurred");
+		}
 	}
 
 	setTimeout(checkTabs, timeout);
@@ -38,7 +43,7 @@ function goToTopStreamForGame(tabId) {
 		var requestData = {
 			"game": tabInfo.gameName,
 			"client_id": clientId,
-			"limit": 1
+			"limit": 10
 		};
 
 		$.ajax({
@@ -50,32 +55,42 @@ function goToTopStreamForGame(tabId) {
 				return;
 			}
 
-			var topStream = responseData.streams[0];
-			var streamUrl;
+			for (var i = 0; i < responseData.length; i++) {
+				var topStream = responseData.streams[0];
 
-			if (tabInfo.isFullscreen) {
-				streamUrl = "http://player.twitch.tv/?channel=" + topStream.channel.name;
-			}
-			else {
-				streamUrl = "https://www.twitch.tv/" + topStream.channel.name;
-			}
+				if (!tabInfo.allowMatureContent && topStream.channel.mature) {
+					continue;
+				}
 
-			if (tab.url == streamUrl) {
-				return;
-			}
+				var streamUrl;
 
-			chrome.tabs.update(tabId, {"url": streamUrl});
+				if (tabInfo.isFullscreen) {
+					streamUrl = "http://player.twitch.tv/?channel=" + topStream.channel.name;
+				}
+				else {
+					streamUrl = "https://www.twitch.tv/" + topStream.channel.name;
+				}
+
+				if (tab.url == streamUrl) {
+					return;
+				}
+
+				chrome.tabs.update(tabId, {"url": streamUrl});
+
+				break;
+			}
 		});
 	});
 }
 
-function addTab(gameName, isFullscreen) {
+function addTab(options) {
 	var createOptions = {
 		"active": true
 	};
 
 	chrome.tabs.create(createOptions, function(tab) {
-		tabsToMonitor.push({"tabId": tab.id, "isFullscreen": isFullscreen, "gameName": gameName});
+		options["tabId"] = tab.id;
+		tabsToMonitor.push(options);
 		goToTopStreamForGame(tab.id);
 	});
 }
