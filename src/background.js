@@ -9,7 +9,7 @@ function checkTabs() {
 			var tabInfo = tabsToMonitor[i];
 			goToTopStreamForGame(tabInfo.tabId);
 		}
-		catch() {
+		catch(e) {
 			console.log("Exception occurred");
 		}
 	}
@@ -55,7 +55,7 @@ function goToTopStreamForGame(tabId) {
 				return;
 			}
 
-			for (var i = 0; i < responseData.length; i++) {
+			for (var i = 0; i < responseData.streams.length; i++) {
 				var topStream = responseData.streams[0];
 
 				if (!tabInfo.allowMatureContent && topStream.channel.mature) {

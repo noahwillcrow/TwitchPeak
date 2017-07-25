@@ -3,7 +3,7 @@ $(function() {
 		chrome.runtime.getBackgroundPage(function(bgWindow) {
 			var gameName = $("#txtGameName").val();
 			var isFullscreen = $("#ckbxIsFullscreen").is(':checked');
-			var allowMature = $("#ckbxAllowMatureContent").is(':allowMature');
+			var allowMature = $("#ckbxAllowMatureContent").is(':checked');
 
 	        bgWindow.addTab({
 	        	gameName: gameName,
